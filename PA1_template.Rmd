@@ -2,19 +2,89 @@
 
 
 ## Loading and preprocessing the data
+``` {r load, echo = TRUE }
+dat <- read.csv("Activity Monitoring data.csv", header = TRUE)
+stepSum <- tapply(dat$steps, dat$date, sum, na.rm = TRUE)
+
+```
 
 
 
 ## What is mean total number of steps taken per day?
 
+``` {r,  echo = TRUE }
+hist(stepSum)
+
+```
+
+``` {r , echo = TRUE }
+m <- mean (stepSum)
+med <- quanntile(stepSum, probs = 0.5)
+
+```
+Mean is `r m` and median is `r med`.
+
 
 
 ## What is the average daily activity pattern?
+
+``` {r , echo = TRUE }
+meanSteps <- tapply(dat$steps, dat$interval, mean, na,rm =T)
+intervals <- dat$interval[1:length(m2)]
+plot (intervals, meanSteps, type = "l")
+maxIndex <- which.max (meanSteps)
+
+
+```
+
+The max value is for interval `r maxIndex`.
 
 
 
 ## Imputing missing values
 
 
+``` {r , echo = TRUE }
+mxNA <- sum(is.na(dat$steps))
+
+newSteps <- dat$steps
+newSteps[is.na(dat$steps}] <- 0
+newDat <- cbind (newSteps, dat$date, dat$interval)
+
+stepSum <- tapply(newDat$nweSteps, dat$date, sum)
+hist(stepSum)
+
+m <- mean (stepSum)
+med <- quanntile(stepSum, probs = 0.5)
+
+```
+
+Mean is `r m` and median is `r med`.
+
+Because the NA values are replaced by 0, asn the original stepSum was calculated using na.rm = T for mean argument(in tapply), there is no chage in the result.
+Hence mean and the total daily steps values are unchanged.
+
+
+
+
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+
+``` {r, echo = TRUE }
+dt <- as.Date(newDat$date, %Y-%m-%d")
+Days <- weekdays(dt)
+lWEnd <- Days %in% c("Saturday", "Sunday")
+Days[lWEnd] <- "weekend"
+
+Days[!lWEnd] <- "weekday"
+newDat <- cbind(newDat, wkDayEnd = Days)
+ newDat$fact <- transform (newDat,factor(Days))
+library(lattice)
+xyplot(meanSteps ~ intervals | fact, data = newDat, type = "l")
+
+```
+
+
